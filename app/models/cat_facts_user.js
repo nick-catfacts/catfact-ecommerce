@@ -130,9 +130,8 @@ cat_facts_user_schema.methods.addRecipient = function(username, phone, interval,
 cat_facts_user_schema.methods.removeRecipient = function(in_username) {
 
   this.recipients.forEach(function(result, index) {
-    if(result === in_username) array.splice(index, 1);
+    if(result.username === in_username) this.recipients.splice(index, 1);
   })
-
 
   this.save()
   .then(function(obj){
@@ -150,24 +149,21 @@ cat_facts_user_schema.methods.removeRecipient = function(in_username) {
 // Card Crud
 cat_facts_user_schema.methods.update_card = function(new_card_token, callback){
 
-  // this is pure stripe logic
-  // do not  want to keep  credit card info locally
+  stripe.customers.update(stripe_customer_id,
+    {
+      source: new_card_token
+    }
+  )
+  .then(function(){
 
-  // stripe.customers.update(
-  //   stripe_customer_id,
-  //   {
-  //     source: new_card_token
-  //   },
-  //   function(err, customer) {
-  //     completion_action.call(this,
-  //       err,
-  //       customer.sources.data,
-  //       callback
-  //     )
-  //   }
-  // )
+  })
+  .catch(function(err){
+    // clean up.. attempt to delete remote token and local card
+    if(callback) return callback(err);
+    throw err;
+  })
 
-  console.log(this.username + " card would be updated")
+
 }
 
 cat_facts_user_schema.methods.delete_card = function(callback){
