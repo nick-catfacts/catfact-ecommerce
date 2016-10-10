@@ -34,7 +34,13 @@ var cat_facts_user_schema = new mongoose.Schema({
   account:{
     messages_used: { type: Number, default: 0 },
     messages_remaining: { type: Number, default: 0 },
-    //credit_card: { type: Number, default: null }
+  },
+  credit_card:{
+    brand: String,
+    last4: Number,
+    exp_year: Number,
+    exp_month: Number,
+    zip: Number
   }
 }, options)
 
@@ -144,8 +150,6 @@ cat_facts_user_schema.methods.removeRecipient = function(in_username) {
 
 };
 
-
-
 // Card Crud
 cat_facts_user_schema.methods.update_card = function(new_card_token, callback){
 
@@ -154,8 +158,18 @@ cat_facts_user_schema.methods.update_card = function(new_card_token, callback){
       source: new_card_token
     }
   )
-  .then(function(){
+  .then(function(customer){
 
+    var cc = customer.sources.data;
+    var this_cc = this.credit_card;
+
+    this_cc.brand = cc.brand;
+    this_cc.last4 = cc.last4;
+    this_cc.exp_year = cc.exp_year;
+    this_cc.exp_month = cc.exp_month;
+    this_cc.zip = cc.zip;
+
+    // save logic here
   })
   .catch(function(err){
     // clean up.. attempt to delete remote token and local card
