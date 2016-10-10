@@ -48,17 +48,27 @@ cat_facts_user_schema.methods.addMessages = function(number_of_messages, callbac
    })
    .catch(function(err){
      if(callback) return callback(err);
+     throw err;
    })
 };
 
 // assign a function to the "methods" object of our animalSchema
 cat_facts_user_schema.methods.removeMessages = function(number_of_messages, callback) {
-  if( (this.account.messages_remaining -= number_of_messages) < 0){
-    // return error logic goes here
-    // find out how to  return proper error messages
-  } else {
+  current_messages = this.account.messages_remaining
+
+  // error  logic
+  if( ( current_messages - number_of_messages) < 0){
+      if(callback) return callback( new RangeError("Cannot decrease messages below zero."));
+      throw new RangeError("Cannot decrease messages below zero.")
+  }
+  else
+  {
+
+    // good logic
     this.messages_used += number_of_messages;
     this.account.messages_remaining -= number_of_messages;
+
+
     // save logic goes here
     this.save()
      .then(function(obj){
@@ -66,6 +76,7 @@ cat_facts_user_schema.methods.removeMessages = function(number_of_messages, call
      })
      .catch(function(err){
        if(callback) return callback(err);
+       throw err;
      })
   }
 };
@@ -86,15 +97,16 @@ cat_facts_user_schema.methods.getRecipients = function() {
 // assign a function to the "methods" object of our animalSchema
 cat_facts_user_schema.methods.addRecipientJson = function(json_recipient, callback) {
   this.recipients.push(json_recipient);
-  // save logic goes here
   this.save()
   .then(function(obj){
     if(callback) return callback(false, obj);
   })
   .catch(function(err){
     if(callback) return callback(err);
+    throw err;
   })
 };
+
 
 // assign a function to the "methods" object of our animalSchema
 cat_facts_user_schema.methods.addRecipient = function(username, phone, interval, number_sent, callback) {
@@ -110,15 +122,28 @@ cat_facts_user_schema.methods.addRecipient = function(username, phone, interval,
   })
   .catch(function(err){
     if(callback) return callback(err);
+    throw err;
   })
 };
 
 // assign a function to the "methods" object of our animalSchema
-cat_facts_user_schema.methods.removeRecipient = function(username) {
-  // have to figure out how to cycle through the recipient array to find a username
+cat_facts_user_schema.methods.removeRecipient = function(in_username) {
+
+  this.recipients.forEach(function(result, index) {
+    if(result === in_username) array.splice(index, 1);
+  })
+
+
+  this.save()
+  .then(function(obj){
+    if(callback) return callback(false, obj);
+  })
+  .catch(function(err){
+    if(callback) return callback(err);
+    throw err;
+  })
+
 };
-
-
 
 
 
@@ -200,7 +225,7 @@ cat_facts_user_schema.statics.createWithStripe = function(username, stormpath_id
 }
 
 
-cat_facts_user_schema.methods.deleteMeWithStripe = function(callback) {
+cat_facts_user_schema.methods.deleteWithStripe = function(callback) {
 
   var this_model = this;
 
