@@ -1,0 +1,6 @@
+test
+app/test
+
+--recursive
+-R spec
+--ui bdd
