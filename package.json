@@ -21,7 +21,7 @@
     "mongodb": "^2.2.10",
     "mongoose": "^4.6.3",
     "stripe": "^4.11.0",
-    "faker": "^3.1.0",
+    "faker": "^3.1.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
