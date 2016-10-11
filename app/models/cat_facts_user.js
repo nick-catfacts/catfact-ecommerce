@@ -49,13 +49,14 @@ var cat_facts_user_schema = new mongoose.Schema({
 
 
 // interval crud
-cat_facts_user_schema.methods.change_recipient_interval = function(username, new_interval){}
-cat_facts_user_schema.methods.change_recipient_interval = function(username, new_interval){}
+cat_facts_user_schema.methods.change_recipient_interval = function(recipient_username, new_interval){
+  this_model = this
 
-
-
-
-
+  this_model.recipients.forEach(function(result, index) {
+    if(result.username === recipient_username) result.interval = new_interval;
+  })
+  return this.save()
+}
 
 // recipient CRUD
 cat_facts_user_schema.methods.get_recipients = function() {
@@ -81,7 +82,6 @@ cat_facts_user_schema.methods.remove_recipient = function(recipient_username) {
   this_model = this
 
   this_model.recipients.forEach(function(result, index) {
-    console.log(result.username)
     if(result.username === recipient_username) this_model.recipients.splice(index, 1);
   })
   return this.save()

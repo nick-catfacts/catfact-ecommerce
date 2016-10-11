@@ -81,6 +81,9 @@ User.create_new(faker.internet.email(), "test").then(function(obj){
 }).then(function(){
     console.log("Removing  recipient: " + recipient.username)
     return user.remove_recipient(recipient.username)
+}).then(function(){
+    console.log("Changing Interval: " + user.recipients[0].username)
+    return user.change_recipient_interval(user.recipients[0].username, 20)
 }).catch(function(err){console.log(err)})
 
 
