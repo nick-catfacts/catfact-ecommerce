@@ -1,5 +1,6 @@
 var user;
 var card;
+var recipient;
 
 User = require('./app/models/cat_facts_user').model
 cc = require('./app/helpers/credit_card')
@@ -70,7 +71,17 @@ User.create_new(faker.internet.email(), "test").then(function(obj){
       console.log("New Message Amount: " + user.get_messages() )
     })
   })
-})
+}).then(function(){
+    var recip = User.create_test_recipient()
+    recipient = recip;
+    return user.add_recipient_json(recip)
+}).then(function(){
+    var recip = User.create_test_recipient()
+    return user.add_recipient_json(recip)
+}).then(function(){
+    console.log("Removing  recipient: " + recipient.username)
+    return user.remove_recipient(recipient.username)
+}).catch(function(err){console.log(err)})
 
 
 

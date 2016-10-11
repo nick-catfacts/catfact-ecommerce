@@ -74,17 +74,18 @@ cat_facts_user_schema.methods.add_recipient = function(username, phone, interval
     interval:interval,
     number_sent:number_sent
   })
-  return this.save().catch(function(err){throw err})
+  return this.save()
 };
 
-cat_facts_user_schema.methods.remove_recipient = function(in_username) {
-  this.recipients.forEach(function(result, index) {
-    if(result.username === in_username) this.recipients.splice(index, 1);
+cat_facts_user_schema.methods.remove_recipient = function(recipient_username) {
+  this_model = this
+
+  this_model.recipients.forEach(function(result, index) {
+    console.log(result.username)
+    if(result.username === recipient_username) this_model.recipients.splice(index, 1);
   })
-  return this.save().catch(function(err){throw err})
+  return this.save()
 };
-
-
 
 
 
@@ -147,7 +148,6 @@ cat_facts_user_schema.methods.update_card = function(new_card_token){
     this_model.credit_card.push(new_card);
     return this_model.save()
   })
-  .catch(function(err){throw err})
 }
 
 cat_facts_user_schema.methods.delete_card = function(){
@@ -164,7 +164,6 @@ cat_facts_user_schema.methods.delete_card = function(){
     }
     return this_user.save()
   })
-  .catch(function(err){throw err})
 }
 
 
@@ -179,10 +178,9 @@ cat_facts_user_schema.methods.delete_me= function() {
       .then(function(){
         return this_model.remove()
       })
-      .catch(function(err){throw err})
 }
 
-// weird naming  to avoid  overwriting the base create method
+// weird naming  to avoid overwriting the base create method
 cat_facts_user_schema.statics.create_new = function(username, stormpath_id) {
 
       var this_model = this;
@@ -205,15 +203,29 @@ cat_facts_user_schema.statics.create_new = function(username, stormpath_id) {
 
 
 // Utility methods
-cat_facts_user_schema.statics.create_test_user = function() {
+// Creates a fake user without hitting Stripe
+cat_facts_user_schema.statics.create_fake_user = function() {
 
       return this.create({
           'username': faker.internet.email(),
           'service_id.stripe': "test",
           'service_id.stormpath': "test"
       })
-      .catch(function(err){throw err})
 }
+
+cat_facts_user_schema.statics.create_test_recipient = function(){
+
+  var fake_recipient = {
+      username: faker.internet.email(),
+      phone: faker.phone.phoneNumberFormat().replace(/\D/g,''),
+      interval: 1,
+      number_sent: 0
+    }
+
+  return fake_recipient;
+}
+
+
 cat_facts_user_schema.methods.charge_stripe = function(amount_in_cents, description){
 
       return stripe.charges.create({
