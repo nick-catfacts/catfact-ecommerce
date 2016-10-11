@@ -35,239 +35,193 @@ var cat_facts_user_schema = new mongoose.Schema({
     messages_used: { type: Number, default: 0 },
     messages_remaining: { type: Number, default: 0 },
   },
-  credit_card:{
-    brand: String,
-    last4: Number,
-    exp_year: Number,
-    exp_month: Number,
-    zip: Number
-  }
+  credit_card:[
+    {
+      brand: {type: String, required: true},
+      last4: {type: Number, required: true},
+      exp_year: {type: Number, required: true},
+      exp_month: {type: Number, required: true},
+      address_zip: {type: Number, required: true},
+      stripe_id: {type: String, required: true}
+    }
+  ]
 }, options)
 
 
-// message CRUD
-cat_facts_user_schema.methods.addMessages = function(number_of_messages, callback) {
-  this.account.messages_remaining += number_of_messages;
-  this.save()
-   .then(function(obj){
-     if(callback) return callback(false, obj);
-   })
-   .catch(function(err){
-     if(callback) return callback(err);
-     throw err;
-   })
-};
-
-// assign a function to the "methods" object of our animalSchema
-cat_facts_user_schema.methods.removeMessages = function(number_of_messages, callback) {
-  current_messages = this.account.messages_remaining
-
-  // error  logic
-  if( ( current_messages - number_of_messages) < 0){
-      if(callback) return callback( new RangeError("Cannot decrease messages below zero."));
-      throw new RangeError("Cannot decrease messages below zero.")
-  }
-  else
-  {
-
-    // good logic
-    this.messages_used += number_of_messages;
-    this.account.messages_remaining -= number_of_messages;
+// interval crud
+cat_facts_user_schema.methods.change_recipient_interval = function(username, new_interval){}
+cat_facts_user_schema.methods.change_recipient_interval = function(username, new_interval){}
 
 
-    // save logic goes here
-    this.save()
-     .then(function(obj){
-       if(callback) return callback(false, obj);
-     })
-     .catch(function(err){
-       if(callback) return callback(err);
-       throw err;
-     })
-  }
-};
 
-// assign a function to the "methods" object of our animalSchema
-cat_facts_user_schema.methods.getMessages = function() {
-  return this.account.messages_remaining;
-};
+
 
 
 // recipient CRUD
-// assign a function to the "methods" object of our animalSchema
-cat_facts_user_schema.methods.getRecipients = function() {
+cat_facts_user_schema.methods.get_recipients = function() {
   return this.recipients;
 };
 
-
-// assign a function to the "methods" object of our animalSchema
-cat_facts_user_schema.methods.addRecipientJson = function(json_recipient, callback) {
+cat_facts_user_schema.methods.add_recipient_json = function(json_recipient) {
   this.recipients.push(json_recipient);
-  this.save()
-  .then(function(obj){
-    if(callback) return callback(false, obj);
-  })
-  .catch(function(err){
-    if(callback) return callback(err);
-    throw err;
-  })
+  return this.save()
 };
 
-
-// assign a function to the "methods" object of our animalSchema
-cat_facts_user_schema.methods.addRecipient = function(username, phone, interval, number_sent, callback) {
+cat_facts_user_schema.methods.add_recipient = function(username, phone, interval, number_sent) {
   this.recipients.push({
     username:username,
     phone:phone,
     interval:interval,
     number_sent:number_sent
   })
-  this.save()
-  .then(function(obj){
-    if(callback) return callback(false, obj);
-  })
-  .catch(function(err){
-    if(callback) return callback(err);
-    throw err;
-  })
+  return this.save().catch(function(err){throw err})
 };
 
-// assign a function to the "methods" object of our animalSchema
-cat_facts_user_schema.methods.removeRecipient = function(in_username) {
-
+cat_facts_user_schema.methods.remove_recipient = function(in_username) {
   this.recipients.forEach(function(result, index) {
     if(result.username === in_username) this.recipients.splice(index, 1);
   })
-
-  this.save()
-  .then(function(obj){
-    if(callback) return callback(false, obj);
-  })
-  .catch(function(err){
-    if(callback) return callback(err);
-    throw err;
-  })
-
+  return this.save().catch(function(err){throw err})
 };
 
-// Card Crud
-cat_facts_user_schema.methods.update_card = function(new_card_token, callback){
 
-  stripe.customers.update(stripe_customer_id,
+
+
+
+// message CRUD
+cat_facts_user_schema.methods.buy_messages = function(amount_in_cents, cost_per_msg_in_cents){
+  var this_model =  this
+  var num_msg = Math.round(amount_in_cents / cost_per_msg_in_cents);
+  return  this_model.charge_stripe(amount_in_cents, "Charge for Catfacts. Thank you meow.")
+  .then(function(charge_obj){
+    console.log(charge_obj)
+    return this_model.add_messages(num_msg)
+  })
+}
+
+cat_facts_user_schema.methods.add_messages = function(number_of_messages) {
+  this.account.messages_remaining += number_of_messages;
+  return this.save()
+};
+
+cat_facts_user_schema.methods.subtract_messages = function(number_of_messages) {
+  var current_messages = this.account.messages_remaining
+
+  if( (current_messages - number_of_messages) < 0){
+      throw new RangeError("Cannot decrease messages below zero.")
+  }
+  else
+  {
+    this.messages_used += number_of_messages;
+    this.account.messages_remaining -= number_of_messages;
+    return this.save()
+  }
+};
+
+cat_facts_user_schema.methods.get_messages = function() {
+  return this.account.messages_remaining;
+};
+
+
+// Card Crud
+cat_facts_user_schema.methods.update_card = function(new_card_token){
+  var this_model = this;
+  return stripe.customers.update(this_model.service_id.stripe,
     {
       source: new_card_token
     }
   )
-  .then(function(customer){
+  .then(function(result){
 
-    var cc = customer.sources.data;
-    var this_cc = this.credit_card;
+    var cc = result.sources.data[0];
 
-    this_cc.brand = cc.brand;
-    this_cc.last4 = cc.last4;
-    this_cc.exp_year = cc.exp_year;
-    this_cc.exp_month = cc.exp_month;
-    this_cc.zip = cc.zip;
+    var new_card = {
+      brand:  cc.brand,
+      last4:  cc.last4,
+      exp_year:  cc.exp_year,
+      exp_month:  cc.exp_month,
+      address_zip:  cc.address_zip,
+      stripe_id: cc.id
+    }
 
-    // save logic here
+    this_model.credit_card.push(new_card);
+    return this_model.save()
   })
-  .catch(function(err){
-    // clean up.. attempt to delete remote token and local card
-    if(callback) return callback(err);
-    throw err;
+  .catch(function(err){throw err})
+}
+
+cat_facts_user_schema.methods.delete_card = function(){
+
+  this_user = this
+
+  return stripe.customers.deleteCard(
+    this_user.service_id.stripe,
+    this_user.credit_card[0].stripe_id
+  )
+  .then(function(obj){
+    if (this_user.credit_card[0]){
+      this_user.credit_card.splice(0, 1)
+    }
+    return this_user.save()
   })
-
-
-}
-
-cat_facts_user_schema.methods.delete_card = function(callback){
-  // stripe.customers.deleteCard(
-  //   stripe_customer_id,
-  //   card_token,
-  //   function(err, confirmation) {
-  //       completion_action.call(this,
-  //         err,
-  //         confirmation,
-  //         callback )
-  //   }
-  // )
-
-  console.log(this.username + " card would be deleted")
+  .catch(function(err){throw err})
 }
 
 
-
-
-
-
-
-
-// figure out how to return both a promise and a callback like mongoose does
-cat_facts_user_schema.statics.createWithStripe = function(username, stormpath_id, callback) {
-
-  var this_model = this;
-  var stripe_id;
-
-      stripe.customers.create({
-        description: 'Catfacts User'
-      })
-      .then(function(user){
-        console.log("Stripe customer created successfully: " + user.id);
-        stripe_id = user.id;
-        return this_model.create({
-          'username': username,
-          'service_id.stripe': user.id,
-          'service_id.stormpath': stormpath_id
-        })
-      })
-      .then( function(mongo_user){
-        console.log("Mongo User created successfully")
-        return callback(false, mongo_user);
-      })
-      .catch(function(err){
-        //rollback ops
-        stripe.customers.del(stripe_id, function(err, conf){
-          if(err) console.log("Unable to delete: " + stripe_id);
-          console.log("Stripe Customer deleted successfully: " + conf.id)
-        })
-        return callback(err);
-      });
-}
-
-
-cat_facts_user_schema.methods.deleteWithStripe = function(callback) {
+// USER crud
+cat_facts_user_schema.methods.delete_me= function() {
 
   var this_model = this;
 
-      stripe.customers.del(
+      return stripe.customers.del(
         this_model.service_id.stripe
       )
       .then(function(){
         return this_model.remove()
       })
-      .then(function(obj){
-        callback(false, obj);
+      .catch(function(err){throw err})
+}
+
+// weird naming  to avoid  overwriting the base create method
+cat_facts_user_schema.statics.create_new = function(username, stormpath_id) {
+
+      var this_model = this;
+
+      return stripe.customers.create({
+        description: 'Catfacts User'
       })
-      .catch(function(err) {
-        callback(err);
+      .then(function(stripe_user){
+        return this_model.create({
+                          'username': username,
+                          'service_id.stripe': stripe_user.id,
+                          'service_id.stormpath': stormpath_id
+        })
+      })
+      .catch(function(err){
+        // do error cleanup here?
+          throw err;
       });
 }
 
 
-cat_facts_user_schema.statics.createTest = function(callback) {
+// Utility methods
+cat_facts_user_schema.statics.create_test_user = function() {
 
-      this.create({
+      return this.create({
           'username': faker.internet.email(),
           'service_id.stripe': "test",
           'service_id.stormpath': "test"
       })
-      .then(function(obj){
-        return callback(false, obj);
-      })
-      .catch(function(err) {
-        callback(err);
-      });
+      .catch(function(err){throw err})
+}
+cat_facts_user_schema.methods.charge_stripe = function(amount_in_cents, description){
 
+      return stripe.charges.create({
+        amount: amount_in_cents,
+        currency: "usd",
+        customer: this.service_id.stripe,
+        description: description
+        })
 }
 
 
