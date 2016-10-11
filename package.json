@@ -1,5 +1,5 @@
 {
-  "name": "mutant-ecommerce",
+  "name": "catfact-ecommerce",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nkiermaier/mutant-ecommerce.git"
+    "url": "git+https://github.com/nick-catfacts/catfact-ecommerce.git"
   },
   "author": "NickKiermaier@gmail.com",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nkiermaier/mutant-ecommerce/issues"
+    "url": "https://github.com/nick-catfacts/catfact-ecommerce/issues"
   },
-  "homepage": "https://github.com/nkiermaier/mutant-ecommerce#readme",
+  "homepage": "https://github.com/nick-catfacts/catfact-ecommerce#readme",
   "dependencies": {
     "bluebird": "^3.4.6",
     "mongodb": "^2.2.10",
