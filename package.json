@@ -20,12 +20,12 @@
     "bluebird": "^3.4.6",
     "mongodb": "^2.2.10",
     "mongoose": "^4.6.3",
-    "stripe": "^4.11.0"
+    "stripe": "^4.11.0",
+    "faker": "^3.1.0",
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "database-cleaner": "^1.1.0",
-    "faker": "^3.1.0",
     "mocha": "^3.1.0",
     "sinon": "^1.17.6"
   }
