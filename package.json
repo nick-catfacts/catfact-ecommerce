@@ -2,7 +2,7 @@
   "name": "catfact-ecommerce",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./app/models/cat_facts_user.js",
   "scripts": {
     "test": "mocha"
   },
