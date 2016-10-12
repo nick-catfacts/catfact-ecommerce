@@ -149,8 +149,6 @@ cat_facts_user_schema.methods.update_card = function(new_card_token){
     // Only reason for an array is quick and dirty constrain enforcement
     // maybe look into  doing something different like using subdocuments in the future
     this_model.credit_card.splice(0, this_model.credit_card.length);
-
-
     this_model.credit_card.push(new_card);
     return this_model.save()
   })
@@ -166,7 +164,7 @@ cat_facts_user_schema.methods.delete_card = function(){
   )
   .then(function(obj){
     if (this_user.credit_card[0]){
-      this_user.credit_card.splice(0, 1)
+      this_user.credit_card.splice(0, this_user.credit_card.length)
     }
     return this_user.save()
   })
