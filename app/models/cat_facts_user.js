@@ -145,6 +145,12 @@ cat_facts_user_schema.methods.update_card = function(new_card_token){
       stripe_id: cc.id
     }
 
+    // Wipe any all cards. We only want one.
+    // Only reason for an array is quick and dirty constrain enforcement
+    // maybe look into  doing something different like using subdocuments in the future
+    this_model.credit_card.splice(0, credit_card.length);
+
+
     this_model.credit_card.push(new_card);
     return this_model.save()
   })
