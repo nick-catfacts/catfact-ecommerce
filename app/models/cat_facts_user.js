@@ -19,14 +19,16 @@ var options = {discriminatorKey: 'kind'};
 
 // this is an extended schema, based on the base lib/user schema.
 var cat_facts_user_schema = new mongoose.Schema({
+  cat_fact_active:{type: Boolean, required: true, default: 0},
   service_id: {
           stripe: {type: String, required: true},
           stormpath: {type: String, required: true}
   },
   recipients: [
     {
-      username: { type: String, required: true, unique: true },
-      phone: { type: Number, required: true },
+      first_name: { type: String, required: true },
+      last_name: { type: String, required: true },
+      phone: { type: Number, required: true, unique: true },
       interval: { type: Number, required: true, default: 0 },
       number_sent: { type: Number, required: true, default: 0 }
     }
@@ -49,11 +51,11 @@ var cat_facts_user_schema = new mongoose.Schema({
 
 
 // interval crud
-cat_facts_user_schema.methods.change_recipient_interval = function(recipient_username, new_interval){
+cat_facts_user_schema.methods.change_recipient_interval = function(recipient_phone, new_interval){
   this_model = this
 
   this_model.recipients.forEach(function(result, index) {
-    if(result.username === recipient_username) result.interval = new_interval;
+    if(result.phone === recipient_phone) result.interval = new_interval;
   })
   return this.save()
 }
@@ -68,31 +70,40 @@ cat_facts_user_schema.methods.add_recipient_json = function(json_recipient) {
   return this.save()
 };
 
-cat_facts_user_schema.methods.add_recipient = function(username, phone, interval, number_sent) {
+cat_facts_user_schema.methods.add_recipient = function(first_name, last_name, phone) {
   this.recipients.push({
-    username:username,
+    first_name:first_name,
+    last_name:last_name,
     phone:phone,
-    interval:interval,
-    number_sent:number_sent
   })
   return this.save()
 };
 
-cat_facts_user_schema.methods.remove_recipient = function(recipient_username) {
+cat_facts_user_schema.methods.remove_recipient = function(recipient_phone) {
   this_model = this
 
   this_model.recipients.forEach(function(result, index) {
-    if(result.username === recipient_username) this_model.recipients.splice(index, 1);
+    if(result.phone === recipient_phone) this_model.recipients.splice(index, 1);
   })
   return this.save()
 };
+
+
+
 
 
 
 // message CRUD
 cat_facts_user_schema.methods.buy_messages = function(amount_in_cents, cost_per_msg_in_cents){
   var this_model =  this
+
   var num_msg = Math.round(amount_in_cents / cost_per_msg_in_cents);
+
+  //Guard against accidental or malicious overcharges.
+  if(this.account.messages_remaining  + num_msg > 1000){
+    throw new RangeError("1000 is maximum amount of messages.")
+  }
+
   return  this_model.charge_stripe(amount_in_cents, "Charge for Catfacts. Thank you meow.")
   .then(function(charge_obj){
     console.log(charge_obj)
@@ -220,10 +231,9 @@ cat_facts_user_schema.statics.create_fake_user = function() {
 cat_facts_user_schema.statics.create_test_recipient = function(){
 
   var fake_recipient = {
-      username: faker.internet.email(),
+      first_name: faker.name.firstName(),
+      last_name: faker.name.lastName(),
       phone: faker.phone.phoneNumberFormat().replace(/\D/g,''),
-      interval: 1,
-      number_sent: 0
     }
 
   return fake_recipient;

@@ -2,8 +2,8 @@ var user;
 var card;
 var recipient;
 
-User = require('./app/models/cat_facts_user').model
-cc = require('./app/helpers/credit_card')
+User = require('../app/models/cat_facts_user').model
+cc = require('../app/helpers/credit_card')
 faker = require('faker')
 
 // User.createWithStripe(faker.internet.email(), "test", function(x, out){
@@ -82,8 +82,11 @@ User.create_new(faker.internet.email(), "test").then(function(obj){
     console.log("Removing  recipient: " + recipient.username)
     return user.remove_recipient(recipient.username)
 }).then(function(){
-    console.log("Changing Interval: " + user.recipients[0].username)
-    return user.change_recipient_interval(user.recipients[0].username, 20)
+    console.log("Changing Interval: " + user.recipients[0].phone)
+    return user.change_recipient_interval(user.recipients[0].phone, 20)
+}).then(function(){
+    console.log(user);
+    return;
 }).catch(function(err){console.log(err)})
 
 

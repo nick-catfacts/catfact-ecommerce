@@ -4,7 +4,7 @@
   "description": "",
   "main": "./app/models/cat_facts_user.js",
   "scripts": {
-    "test": "mocha"
+    "test": "node ./clutter/first_pass_testing.js"
   },
   "repository": {
     "type": "git",
