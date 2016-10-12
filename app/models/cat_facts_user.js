@@ -91,7 +91,7 @@ cat_facts_user_schema.methods.remove_recipient = function(recipient_phone) {
   this_model = this
 
   this_model.recipients.forEach(function(result, index) {
-    if(result.phone === recipient_phone) this_model.recipients.splice(index, 1);
+    if(result.phone === parseInt(recipient_phone)) this_model.recipients.splice(index, 1);
   })
   return this.save()
 };
