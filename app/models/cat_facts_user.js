@@ -67,7 +67,7 @@ cat_facts_user_schema.methods.get_recipients = function() {
   var processed_output = [];
 
   this_model.recipients.forEach(function(result, index) {
-    processed_output.push( lodash.omit(result, ['_id'] ) )
+    processed_output.push( lodash.omit(result.toObject(), ['_id'] ) )
   })
 
   return processed_output;
