@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 var stripe = require('stripe')("sk_test_lZBQXOzeaJ9mfbWMGQbwdXrt");
 var CatFactUser = require('./cat_facts_user').model
 var faker = require('faker')
+var lodash = require('lodash')
 
 
 if(mongoose.connection.readyState == 0){
@@ -62,7 +63,14 @@ cat_facts_user_schema.methods.change_recipient_interval = function(recipient_pho
 
 // recipient CRUD
 cat_facts_user_schema.methods.get_recipients = function() {
-  return this.recipients;
+  this_model = this
+  var processed_output = [];
+
+  this_model.recipients.forEach(function(result, index) {
+    processed_output.push( lodash.omit(result, ['_id'] ) )
+  })
+
+  return processed_output;
 };
 
 cat_facts_user_schema.methods.add_recipient_json = function(json_recipient) {
