@@ -61,6 +61,23 @@ cat_facts_user_schema.methods.change_recipient_interval = function(recipient_pho
   return this.save()
 }
 
+
+// interval CRUD
+cat_facts_user_schema.methods.update_recipient = function(recipient_phone, json_recipient){
+  this_model = this
+
+  // JSON params allowed: first_name, last_name, phone, interval
+  // lodash merge two json strings
+  this_model.recipients.forEach(function(result, index) {
+    if(result.phone === parseInt(recipient_phone)) {
+      lodash.merge(this_model.recipients[index], json_recipient)
+    }
+  })
+  return this.save()
+}
+
+
+
 // recipient CRUD
 cat_facts_user_schema.methods.get_recipients = function() {
   this_model = this
