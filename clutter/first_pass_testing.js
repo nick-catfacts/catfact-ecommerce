@@ -2,7 +2,7 @@ var user;
 var card;
 var recipient;
 
-User = require('../app/models/cat_facts_user')('sk_test_lZBQXOzeaJ9mfbWMGQbwdXrt', 'mongodb://localhost/catfacts').model
+User = require('../app/models/cat_facts_user').model
 cc = require('../app/helpers/credit_card')
 faker = require('faker')
 
