@@ -56,7 +56,7 @@ cat_facts_user_schema.methods.change_recipient_interval = function(recipient_pho
   this_model = this
 
   this_model.recipients.forEach(function(result, index) {
-    if(result.phone === recipient_phone) result.interval = new_interval;
+    if(parseInt(result.phone) === parseInt(recipient_phone)) result.interval = new_interval;
   })
   return this.save()
 }
@@ -69,7 +69,7 @@ cat_facts_user_schema.methods.update_recipient = function(recipient_phone, json_
   // JSON params allowed: first_name, last_name, phone, interval
   // lodash merge two json strings
   this_model.recipients.forEach(function(result, index) {
-    if(result.phone === parseInt(recipient_phone)) {
+    if(parseInt(result.phone) === parseInt(recipient_phone)) {
       lodash.merge(this_model.recipients[index], json_recipient)
     }
   })
@@ -90,6 +90,19 @@ cat_facts_user_schema.methods.get_recipients = function() {
   return processed_output;
 };
 
+
+cat_facts_user_schema.methods.get_recipient = function(recipient_id) {
+  var this_model = this
+  var the_return = false;
+
+  this_model.recipients.forEach(function(result, index) {
+    if(parseInt(result.phone) === parseInt(recipient_id)){
+      the_return = result;
+    }
+  })
+  return the_return;
+}
+
 cat_facts_user_schema.methods.add_recipient_json = function(json_recipient) {
   this.recipients.push(json_recipient);
   return this.save()
@@ -108,7 +121,7 @@ cat_facts_user_schema.methods.remove_recipient = function(recipient_phone) {
   this_model = this
 
   this_model.recipients.forEach(function(result, index) {
-    if(result.phone === parseInt(recipient_phone)) this_model.recipients.splice(index, 1);
+    if(parseInt(result.phone) === parseInt(recipient_phone)) this_model.recipients.splice(index, 1);
   })
   return this.save()
 };
