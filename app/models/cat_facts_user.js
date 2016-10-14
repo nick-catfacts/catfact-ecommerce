@@ -44,10 +44,9 @@ var options = {discriminatorKey: 'kind'};
 
 // this is an extended schema, based on the base lib/user schema.
 var cat_facts_user_schema = new mongoose.Schema({
-  cat_fact_active:{type: Boolean, required: true, default: 0},
+  cat_fact_active:{type: Boolean, required: true, default: true},
   service_id: {
-          stripe: {type: String, required: true},
-          stormpath: {type: String, required: true}
+          stripe: {type: String, required: true}
   },
   recipients: [
     {
@@ -258,7 +257,7 @@ cat_facts_user_schema.methods.delete_me= function() {
 }
 
 // weird naming  to avoid overwriting the base create method
-cat_facts_user_schema.statics.create_new = function(username, stormpath_id) {
+cat_facts_user_schema.statics.create_new = function(username, password) {
 
       var this_model = this;
 
@@ -268,8 +267,8 @@ cat_facts_user_schema.statics.create_new = function(username, stormpath_id) {
       .then(function(stripe_user){
         return this_model.create({
                           'username': username,
-                          'service_id.stripe': stripe_user.id,
-                          'service_id.stormpath': stormpath_id
+                          'password': password,
+                          'service_id.stripe': stripe_user.id
         })
       })
       .catch(function(err){
@@ -285,8 +284,8 @@ cat_facts_user_schema.statics.create_fake_user = function() {
 
       return this.create({
           'username': faker.internet.email(),
-          'service_id.stripe': "test",
-          'service_id.stormpath': "test"
+          'password': 'test',
+          'service_id.stripe': "test"
       })
 }
 
