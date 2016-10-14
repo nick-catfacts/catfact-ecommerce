@@ -170,11 +170,19 @@ cat_facts_user_schema.methods.buy_messages = function(amount_in_cents, cost_per_
     console.log(charge_obj)
     return this_model.add_messages(num_msg)
   })
+  .catch(function(err){
+    console.log(err)
+    throw err;
+  })
 }
 
 cat_facts_user_schema.methods.add_messages = function(number_of_messages) {
   this.account.messages_remaining += number_of_messages;
   return this.save()
+  .catch(function(err){
+    console.log(err)
+    throw err;
+  })
 };
 
 cat_facts_user_schema.methods.subtract_messages = function(number_of_messages) {
@@ -188,6 +196,10 @@ cat_facts_user_schema.methods.subtract_messages = function(number_of_messages) {
     this.messages_used += number_of_messages;
     this.account.messages_remaining -= number_of_messages;
     return this.save()
+    .catch(function(err){
+      console.log(err)
+      throw err;
+    })
   }
 };
 
@@ -224,6 +236,10 @@ cat_facts_user_schema.methods.update_card = function(new_card_token){
     this_model.credit_card.push(new_card);
     return this_model.save()
   })
+  .catch(function(err){
+    console.log(err)
+    throw err;
+  })
 }
 
 cat_facts_user_schema.methods.delete_card = function(){
@@ -240,6 +256,10 @@ cat_facts_user_schema.methods.delete_card = function(){
     }
     return this_user.save()
   })
+  .catch(function(err){
+    console.log(err)
+    throw err;
+  })
 }
 
 
@@ -253,6 +273,10 @@ cat_facts_user_schema.methods.delete_me= function() {
       )
       .then(function(){
         return this_model.remove()
+      })
+      .catch(function(err){
+        console.log(err)
+        throw err;
       })
 }
 
@@ -273,6 +297,7 @@ cat_facts_user_schema.statics.create_new = function(username, password) {
       })
       .catch(function(err){
         // do error cleanup here?
+          console.log(err);
           throw err;
       });
 }
@@ -308,6 +333,10 @@ cat_facts_user_schema.methods.charge_stripe = function(amount_in_cents, descript
         currency: "usd",
         customer: this.service_id.stripe,
         description: description
+        })
+        .catch(function(err){
+          console.log(err)
+          throw err;
         })
 }
 
