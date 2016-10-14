@@ -52,7 +52,7 @@ var cat_facts_user_schema = new mongoose.Schema({
     {
       first_name: { type: String, required: true },
       last_name: { type: String, required: true },
-      phone: { type: Number, required: true, unique: true },
+      phone: { type: Number, required: true},
       interval: { type: Number, required: true, default: 0 },
       number_sent: { type: Number, required: true, default: 0 }
     }
