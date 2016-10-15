@@ -86,13 +86,13 @@ cat_facts_user_schema.methods.change_recipient_interval = function(recipient_pho
 
 
 // interval CRUD
-cat_facts_user_schema.methods.update_recipient = function(recipient_phone, json_recipient){
+cat_facts_user_schema.methods.update_recipient = function(recipient_id, json_recipient){
   this_model = this
 
   // JSON params allowed: first_name, last_name, phone, interval
   // lodash merge two json strings
   this_model.recipients.forEach(function(result, index) {
-    if(parseInt(result.phone) === parseInt(recipient_phone)) {
+    if(parseInt(result._id) === parseInt(recipient_id)) {
       lodash.merge(this_model.recipients[index], json_recipient)
     }
   })
@@ -101,7 +101,7 @@ cat_facts_user_schema.methods.update_recipient = function(recipient_phone, json_
 
 
 
-// // recipient CRUD
+// // // recipient CRUD
 // cat_facts_user_schema.methods.get_recipients = function() {
 //   this_model = this
 //   var processed_output = [];
@@ -113,19 +113,13 @@ cat_facts_user_schema.methods.update_recipient = function(recipient_phone, json_
 //   return processed_output;
 // };
 
-cat_facts_user_schema.methods.get_recipients = function() {
-  return this.model.recipients;
-};
-
-
-
 
 cat_facts_user_schema.methods.get_recipient = function(recipient_id) {
   var this_model = this
   var the_return = false;
 
   this_model.recipients.forEach(function(result, index) {
-    if(parseInt(result.phone) === parseInt(recipient_id)){
+    if(parseInt(result._id) === parseInt(recipient_id)){
       the_return = result;
     }
   })
