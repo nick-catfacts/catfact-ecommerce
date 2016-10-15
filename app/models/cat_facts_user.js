@@ -101,17 +101,23 @@ cat_facts_user_schema.methods.update_recipient = function(recipient_phone, json_
 
 
 
-// recipient CRUD
+// // recipient CRUD
+// cat_facts_user_schema.methods.get_recipients = function() {
+//   this_model = this
+//   var processed_output = [];
+
+//   this_model.recipients.forEach(function(result, index) {
+//     processed_output.push( lodash.omit(result.toObject(), ['_id'] ) )
+//   })
+
+//   return processed_output;
+// };
+
 cat_facts_user_schema.methods.get_recipients = function() {
-  this_model = this
-  var processed_output = [];
-
-  this_model.recipients.forEach(function(result, index) {
-    processed_output.push( lodash.omit(result.toObject(), ['_id'] ) )
-  })
-
-  return processed_output;
+  return this.model.recipients;
 };
+
+
 
 
 cat_facts_user_schema.methods.get_recipient = function(recipient_id) {
@@ -125,6 +131,8 @@ cat_facts_user_schema.methods.get_recipient = function(recipient_id) {
   })
   return the_return;
 }
+
+
 
 cat_facts_user_schema.methods.add_recipient_json = function(json_recipient) {
   this.recipients.push(json_recipient);
