@@ -68,7 +68,7 @@ var cat_facts_user_schema = new mongoose.Schema({
       exp_year: {type: Number, required: true},
       exp_month: {type: Number, required: true},
       address_zip: {type: Number, required: true},
-      stripe_id: {type: String, required: true}
+      id: {type: String, required: true}
     }
   ]
 }, options)
@@ -222,20 +222,13 @@ cat_facts_user_schema.methods.update_card = function(new_card_token){
 
     var cc = result.sources.data[0];
 
-    var new_card = {
-      brand:  cc.brand,
-      last4:  cc.last4,
-      exp_year:  cc.exp_year,
-      exp_month:  cc.exp_month,
-      address_zip:  cc.address_zip,
-      stripe_id: cc.id
-    }
-
     // Wipe any all cards. We only want one.
     // Only reason for an array is quick and dirty constrain enforcement
-    // maybe look into  doing something different like using subdocuments in the future
+    // maybe look into  doing something different like using subdocuments in the future?
     this_model.credit_card.splice(0, this_model.credit_card.length);
-    this_model.credit_card.push(new_card);
+
+    //pushes whole stripe array onto the model which only stores the fields in the credit card model
+    this_model.credit_card.push(cc);
     return this_model.save()
   })
   .catch(function(err){
