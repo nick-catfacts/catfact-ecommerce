@@ -84,7 +84,7 @@ var cat_facts_user_schema = new mongoose.Schema({
 
 // interval crud
 cat_facts_user_schema.methods.change_recipient_interval = function(recipient_phone, new_interval){
-  this_model = this
+  var this_model = this
 
   this_model.recipients.forEach(function(result, index) {
     if(parseInt(result.phone) === parseInt(recipient_phone)) result.interval = new_interval;
@@ -95,18 +95,22 @@ cat_facts_user_schema.methods.change_recipient_interval = function(recipient_pho
 
 // interval CRUD
 cat_facts_user_schema.methods.update_recipient = function(recipient_id, json_recipient){
-  this_model = this
+  var this_model = this
+  var is_update = false
 
   // JSON params allowed: first_name, last_name, phone, interval
   // lodash merge two json strings
   this_model.recipients.forEach(function(result, index) {
     if(result.id == recipient_id) {
       lodash.merge(this_model.recipients[index], json_recipient)
-    }
-    else{
-      throw new RangeError("Could not find recipient in <User>.update_recipient.")
+      is_update = true;
     }
   })
+
+  if(!is_update){
+    throw new RangeError("Could not find recipient in <User>.update_recipient.")
+  }
+
   return this.save()
 }
 
