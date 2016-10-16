@@ -160,6 +160,10 @@ cat_facts_user_schema.methods.remove_recipient = function(recipient_phone) {
 cat_facts_user_schema.methods.buy_messages = function(amount_in_cents, cost_per_msg_in_cents){
   var this_model =  this
 
+  if(!amount_in_cents || !cost_per_msg_in_cents){
+    throw new TypeError("number_of_messages parameter does not exist in model.add_messages!")
+  }
+
   var num_msg = Math.round(amount_in_cents / cost_per_msg_in_cents);
 
   //Guard against accidental or malicious overcharges.
@@ -179,6 +183,11 @@ cat_facts_user_schema.methods.buy_messages = function(amount_in_cents, cost_per_
 }
 
 cat_facts_user_schema.methods.add_messages = function(number_of_messages) {
+
+  if(!number_of_messages){
+    throw new TypeError("number_of_messages parameter does not exist in model.add_messages!")
+  }
+
   this.account.messages_remaining += number_of_messages;
   return this.save()
   .catch(function(err){
@@ -214,7 +223,7 @@ cat_facts_user_schema.methods.get_messages = function() {
 cat_facts_user_schema.methods.update_card = function(new_card_token){
 
   if(!new_card_token){
-    throw new TypeError("Stripe Token parameter does not exist in user.update_card!")
+    throw new TypeError("Stripe Token parameter does not exist in model.update_card!")
   }
 
   var this_model = this;
