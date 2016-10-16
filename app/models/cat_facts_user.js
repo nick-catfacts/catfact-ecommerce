@@ -243,7 +243,7 @@ cat_facts_user_schema.methods.delete_card = function(){
 
   return stripe.customers.deleteCard(
     this_user.service_id.stripe,
-    this_user.credit_card[0].stripe_id
+    this_user.credit_card[0].id
   )
   .then(function(obj){
     if (this_user.credit_card[0]){
