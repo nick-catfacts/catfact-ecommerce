@@ -56,7 +56,13 @@ var cat_facts_user_schema = new mongoose.Schema({
       phone: { type: Number, required: true},
       interval: { type: Number, required: true, default: 0 },
       number_sent: { type: Number, required: true, default: 0 },
-      id:{type:String, required: true, default: crypto.randomBytes(16).toString('hex') }
+      id:{
+        type:String,
+        required: true,
+        default: function(){
+          return crypto.randomBytes(16).toString('hex')
+        }
+      }
     }
   ],
   account:{
@@ -121,7 +127,7 @@ cat_facts_user_schema.methods.get_recipient = function(recipient_id) {
   var the_return = false;
 
   this_model.recipients.forEach(function(result, index) {
-    if(parseInt(result._id) === parseInt(recipient_id)){
+    if(result.id === recipient_id){
       the_return = result;
     }
   })
