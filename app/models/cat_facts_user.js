@@ -212,6 +212,11 @@ cat_facts_user_schema.methods.get_messages = function() {
 
 // Card Crud
 cat_facts_user_schema.methods.update_card = function(new_card_token){
+
+  if(!new_card_token){
+    throw new TypeError("Stripe Token parameter does not exist in user.update_card!")
+  }
+
   var this_model = this;
   return stripe.customers.update(this_model.service_id.stripe,
     {
@@ -221,12 +226,10 @@ cat_facts_user_schema.methods.update_card = function(new_card_token){
   .then(function(result){
 
     var cc = result.sources.data[0];
-
     // Wipe any all cards. We only want one.
     // Only reason for an array is quick and dirty constrain enforcement
     // maybe look into  doing something different like using subdocuments in the future?
     this_model.credit_card.splice(0, this_model.credit_card.length);
-
     //pushes whole stripe array onto the model which only stores the fields in the credit card model
     this_model.credit_card.push(cc);
     return this_model.save()
