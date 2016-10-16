@@ -27,6 +27,7 @@ var stripe = require('stripe')(stripe_secret_key);
 var CatFactUser = require('./cat_facts_user').model
 var faker = require('faker')
 var lodash = require('lodash')
+const crypto = require('crypto');
 
 
 
@@ -54,7 +55,8 @@ var cat_facts_user_schema = new mongoose.Schema({
       last_name: { type: String, required: true },
       phone: { type: Number, required: true},
       interval: { type: Number, required: true, default: 0 },
-      number_sent: { type: Number, required: true, default: 0 }
+      number_sent: { type: Number, required: true, default: 0 },
+      id:{type:String, required: true, default: crypto.randomBytes(16).toString('hex') }
     }
   ],
   account:{
