@@ -100,7 +100,7 @@ cat_facts_user_schema.methods.update_recipient = function(recipient_id, json_rec
   // JSON params allowed: first_name, last_name, phone, interval
   // lodash merge two json strings
   this_model.recipients.forEach(function(result, index) {
-    if(parseInt(result.id) === parseInt(recipient_id)) {
+    if(result.id == recipient_id) {
       lodash.merge(this_model.recipients[index], json_recipient)
     }
     else{
