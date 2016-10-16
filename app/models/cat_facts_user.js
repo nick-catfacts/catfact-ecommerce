@@ -100,8 +100,11 @@ cat_facts_user_schema.methods.update_recipient = function(recipient_id, json_rec
   // JSON params allowed: first_name, last_name, phone, interval
   // lodash merge two json strings
   this_model.recipients.forEach(function(result, index) {
-    if(parseInt(result._id) === parseInt(recipient_id)) {
+    if(parseInt(result.id) === parseInt(recipient_id)) {
       lodash.merge(this_model.recipients[index], json_recipient)
+    }
+    else{
+      throw new RangeError("Could not find recipient in <User>.update_recipient.")
     }
   })
   return this.save()
